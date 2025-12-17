@@ -4,7 +4,6 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
         tabBarStyle: { display: "none" },
       }}
     >
@@ -12,6 +11,20 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Home",
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="service-categories"
+        options={{
+          title: "Service Categories",
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="services-list"
+        options={{
+          title: "Services List",
           headerShown: false,
         }}
       />

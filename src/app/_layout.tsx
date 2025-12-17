@@ -14,8 +14,6 @@ export default function RootLayout() {
             navigationBarHidden: true,
           }}
         />
-        <Stack.Screen name="service-categories" />
-        <Stack.Screen name="services-list" />
       </Stack>
     </RootProvider>
   );

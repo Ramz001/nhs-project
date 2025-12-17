@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native";
 import { YStack, XStack, Text, Card, Circle } from "tamagui";
 import {
   Stethoscope,
@@ -44,7 +44,7 @@ export default function ServiceCategoriesPage() {
     console.log("Navigating to services-list with type:", type);
     router.push({
       pathname: "/services-list",
-      params: { type }
+      params: { type },
     });
   };
 
@@ -67,39 +67,35 @@ export default function ServiceCategoriesPage() {
             const Icon = service.icon;
 
             return (
-              <TouchableOpacity
+              <Card
                 key={service.type}
+                px="$4"
+                py="$4"
+                borderRadius="$4"
+                elevate
+                pressStyle={{ scale: 0.98 }}
                 onPress={() => handleCategoryPress(service.type)}
-                activeOpacity={0.7}
               >
-                <Card
-                  px="$4"
-                  py="$4"
-                  borderRadius="$4"
-                  elevate
-                  pressStyle={{ scale: 0.98 }}
-                >
-                  <XStack gap="$4" items="center">
-                    {/* Icon Circle */}
-                    <Circle rounded={"$4"} size={56} bg="$blue4">
-                      <Icon size={28} color="$blue10" />
-                    </Circle>
+                <XStack gap="$4" items="center">
+                  {/* Icon Circle */}
+                  <Circle rounded={"$4"} size={56} bg="$blue4">
+                    <Icon size={28} color="$blue10" />
+                  </Circle>
 
-                    {/* Text Content */}
-                    <YStack flex={1} gap="$1">
-                      <Text fontSize="$6" fontWeight="600">
-                        {service.label}
-                      </Text>
-                      <Text fontSize="$3" color="$color">
-                        {service.description}
-                      </Text>
-                    </YStack>
+                  {/* Text Content */}
+                  <YStack flex={1} gap="$1">
+                    <Text fontSize="$6" fontWeight="600">
+                      {service.label}
+                    </Text>
+                    <Text fontSize="$3" color="$color">
+                      {service.description}
+                    </Text>
+                  </YStack>
 
-                    {/* Chevron */}
-                    <ChevronRight size={24} color="$color" />
-                  </XStack>
-                </Card>
-              </TouchableOpacity>
+                  {/* Chevron */}
+                  <ChevronRight size={24} color="$color" />
+                </XStack>
+              </Card>
             );
           })}
         </YStack>
