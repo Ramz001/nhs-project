@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nhs-project",
-    "slug": "national-health-system",
+    "name": "National Health Services",
+    "slug": "national-health-services",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",

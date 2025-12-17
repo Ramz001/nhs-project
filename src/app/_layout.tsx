@@ -1,19 +1,22 @@
 import RootProvider from "@/providers/root.provider";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 export default function RootLayout() {
   return (
     <RootProvider>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            title: "Home",
+            navigationBarHidden: true,
+          }}
         />
+        <Stack.Screen name="service-categories" />
+        <Stack.Screen name="services-list" />
       </Stack>
-      <StatusBar style="auto" />
     </RootProvider>
   );
 }
