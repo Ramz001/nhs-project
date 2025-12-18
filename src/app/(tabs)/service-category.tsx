@@ -16,10 +16,10 @@ export default function ServiceCategoriesPage() {
     queryFn: async () => supabase.from("service_type").select("*"),
   });
 
-  const handleCategoryPress = (type: string) => {
+  const handleCategoryPress = (id: string) => {
     router.push({
       pathname: "/service-list",
-      params: { type },
+      params: { id },
     });
   };
 
@@ -61,7 +61,7 @@ export default function ServiceCategoriesPage() {
                     borderRadius="$4"
                     elevate
                     pressStyle={{ scale: 0.98 }}
-                    onPress={() => handleCategoryPress(service.title)}
+                    onPress={() => handleCategoryPress(service.id)}
                   >
                     <XStack gap="$4" items="center">
                       <Circle rounded="$4" size={56} bg="$blue4">

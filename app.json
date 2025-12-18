@@ -52,7 +52,8 @@
         "projectId": "7efb31c6-1f54-4453-8544-c4685a4cb2c4"
       },
       "supabaseUrl": "https://etlacmlpjyfomaxttnqr.supabase.co",
-      "supabaseKey": "sb_publishable_MiZMayqPsg2gPtcuNNL74g_uxh9stDm"
+      "supabaseKey": "sb_publishable_MiZMayqPsg2gPtcuNNL74g_uxh9stDm",
+      "googleMapsApiKey": "AIzaSyDI8NCEcSpw0jSPbckOfe5ugLSs7ihTeyU"
     },
     "owner": "ramz001"
   }

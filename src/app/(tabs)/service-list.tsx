@@ -10,8 +10,8 @@ import { Button, Card, Text, XStack, YStack } from "tamagui";
 export default function ServicesListPage() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const serviceTypeId = (params.type as string) || "";
-
+  const serviceTypeId = (params.id as string) || "";
+  console.log(params)
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
   const { data: { data: services } = {}, isLoading } = useQuery({
