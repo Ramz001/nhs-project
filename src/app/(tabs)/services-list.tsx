@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { YStack, XStack, Text, Card, Button } from "tamagui";
 import { MapPin, Phone, Check } from "@tamagui/lucide-icons";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 
 // Mock data - will be replaced with actual API data
 const mockServices = [
@@ -59,10 +59,6 @@ export default function ServicesListPage() {
     return titles[type] || "Services";
   };
 
-  const handleServiceSelect = (serviceId: string) => {
-    setSelectedService(serviceId);
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -83,78 +79,80 @@ export default function ServicesListPage() {
               const isSelected = selectedService === service.id;
 
               return (
-                <TouchableOpacity
+                <Card
                   key={service.id}
-                  onPress={() => handleServiceSelect(service.id)}
-                  activeOpacity={0.7}
+                  px="$4"
+                  py="$4"
+                  borderRadius="$4"
+                  elevate
+                  borderWidth={isSelected ? 2 : 0}
+                  borderColor={isSelected ? "$blue10" : "transparent"}
+                  bg={isSelected ? "$blue2" : "$background"}
+                  pressStyle={{ scale: 0.98 }}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(tabs)/service-detail",
+                      params: { id: service.id },
+                    })
+                  }
+                  cursor="pointer"
                 >
-                  <Card
-                    px="$4"
-                    py="$4"
-                    borderRadius="$4"
-                    elevate
-                    borderWidth={isSelected ? 2 : 0}
-                    borderColor={isSelected ? "$blue10" : "transparent"}
-                    bg={isSelected ? "$blue2" : "$background"}
-                    pressStyle={{ scale: 0.98 }}
-                  >
-                    <YStack gap="$3">
-                      {/* Header Row */}
-                      <XStack items="center" justify="space-between">
-                        <YStack flex={1} gap="$1">
-                          <Text fontSize="$6" fontWeight="600">
-                            {service.name}
-                          </Text>
-                          <XStack items="center" gap="$2">
-                            <MapPin size={16} color="$blue10" />
-                            <Text
-                              fontSize="$4"
-                              fontWeight="600"
-                              color="$blue10"
-                            >
-                              {service.distance} km
-                            </Text>
-                          </XStack>
-                        </YStack>
-                        {isSelected && (
-                          <XStack
-                            bg="$blue10"
-                            px="$3"
-                            py="$2"
-                            rounded="$4"
-                            items="center"
-                            gap="$2"
+                  <YStack gap="$3">
+                    {/* Header Row */}
+                    <XStack items="center" justify="space-between">
+                      <YStack flex={1} gap="$1">
+                        <Text fontSize="$6" fontWeight="600">
+                          {service.name}
+                        </Text>
+                        <XStack items="center" gap="$2">
+                          <MapPin size={16} color="$blue10" />
+                          <Text
+                            fontSize="$4"
+                            fontWeight="600"
+                            color="$blue10"
                           >
-                            <Check size={16} color="white" />
-                            <Text fontSize="$3" fontWeight="600" color="white">
-                              Selected
-                            </Text>
-                          </XStack>
-                        )}
-                      </XStack>
+                            {service.distance} km
+                          </Text>
+                        </XStack>
+                      </YStack>
+                      {isSelected && (
+                        <XStack
+                          bg="$blue10"
+                          px="$3"
+                          py="$2"
+                          rounded="$4"
+                          items="center"
+                          gap="$2"
+                        >
+                          <Check size={16} color="white" />
+                          <Text fontSize="$3" fontWeight="600" color="white">
+                            Selected
+                          </Text>
+                        </XStack>
+                      )}
+                    </XStack>
 
-                      {/* Address */}
-                      <XStack items="flex-start" gap="$2">
-                        <MapPin
-                          size={16}
-                          color="$color"
-                          style={{ marginTop: 2 }}
-                        />
-                        <Text fontSize="$4" color="$color" flex={1}>
-                          {service.address}
-                        </Text>
-                      </XStack>
+                    {/* Address */}
+                    <XStack items="flex-start" gap="$2">
+                      <MapPin
+                        size={16}
+                        color="$color"
+                        style={{ marginTop: 2 }}
+                      />
+                      <Text fontSize="$4" color="$color" flex={1}>
+                        {service.address}
+                      </Text>
+                    </XStack>
 
-                      {/* Phone */}
-                      <XStack items="center" gap="$2">
-                        <Phone size={16} color="$color" />
-                        <Text fontSize="$4" color="$color">
-                          {service.phone}
-                        </Text>
-                      </XStack>
-                    </YStack>
-                  </Card>
-                </TouchableOpacity>
+                    {/* Phone */}
+                    <XStack items="center" gap="$2">
+                      <Phone size={16} color="$color" />
+                      <Text fontSize="$4" color="$color">
+                        {service.phone}
+                      </Text>
+                    </XStack>
+                  </YStack>
+                </Card>
               );
             })}
           </YStack>

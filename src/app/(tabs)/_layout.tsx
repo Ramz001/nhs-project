@@ -28,6 +28,13 @@ export default function TabsLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="service-detail"
+        options={{
+          title: "Service Detail",
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }
