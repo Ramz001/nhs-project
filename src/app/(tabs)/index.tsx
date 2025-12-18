@@ -9,7 +9,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleSearch = () => {
-    router.push("/service-categories");
+    router.push("/service-category");
   };
 
   return (

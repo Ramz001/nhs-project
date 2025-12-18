@@ -15,14 +15,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="service-categories"
+        name="service-category"
         options={{
           title: "Service Categories",
           headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="services-list"
+        name="service-list"
         options={{
           title: "Services List",
           headerShown: false,

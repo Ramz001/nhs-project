@@ -18,7 +18,7 @@ export default function ServiceCategoriesPage() {
 
   const handleCategoryPress = (type: string) => {
     router.push({
-      pathname: "/services-list",
+      pathname: "/service-list",
       params: { type },
     });
   };
