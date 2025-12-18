@@ -1,3 +1,4 @@
+import QueryProvider from "./query.provider";
 import StoreProvider from "./store.provider";
 import ThemeProvider from "./theme.provider";
 
@@ -8,9 +9,9 @@ export default function RootProvider({
 }) {
   return (
     <StoreProvider>
-      {/* <QueryProvider> */}
+      <QueryProvider>
         <ThemeProvider>{children}</ThemeProvider>
-      {/* </QueryProvider> */}
+      </QueryProvider>
     </StoreProvider>
   );
 }

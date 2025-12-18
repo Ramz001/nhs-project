@@ -1,15 +1,15 @@
+import { MapPin } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { YStack, Input, Button, Text, Card } from "tamagui";
-import { MapPin } from "@tamagui/lucide-icons";
-import { useRouter } from "expo-router";
+import { Button, Card, Input, Text, YStack } from "tamagui";
 
 export default function HomePage() {
   const router = useRouter();
 
   const handleSearch = () => {
-    router.push("/(tabs)/service-categories");
+    router.push("/service-categories");
   };
 
   return (
