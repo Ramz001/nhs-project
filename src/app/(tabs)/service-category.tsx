@@ -30,7 +30,7 @@ export default function ServiceCategoriesPage() {
     return (
       <YStack flex={1} justify="center" items="center">
         <ActivityIndicator size="large" color="$blue10" />
-        <Text mt="$2">Loading services...</Text>
+        <Text mt="$2">Loading categories...</Text>
       </YStack>
     );
   }
