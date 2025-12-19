@@ -1,4 +1,5 @@
 /* eslint-disable import/no-named-as-default */
+import { postcodeToLocation } from "@/constants/postcodeToLocation";
 import {
   setAgeFilter,
   setLocation,
@@ -25,21 +26,34 @@ const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 
 export default function HomePage() {
   const router = useRouter();
-  const postcode = useAppSelector((state) => state.navigation.postcode);
-  const age = useAppSelector((state) => state.navigation.ageFilter);
+  const {
+    postcode,
+    ageFilter: age,
+    location,
+  } = useAppSelector((state) => state.navigation);
   const dispatch = useAppDispatch();
 
   const handleSearch = () => {
     try {
       const validated = SearchValidationSchema.safeParse({
         postcode: Number(postcode),
-        age,
+        age: age ? Number(age) : undefined,
       });
 
       if (!validated.success) {
         const firstError = validated.error.issues[0];
-        Alert.alert("Validation Error", firstError.message);
+        Alert.alert("Validation Error", firstError.message + postcode + age);
         return;
+      }
+
+      const postcodeLocation =
+        postcodeToLocation[
+          validated.data.postcode as keyof typeof postcodeToLocation
+        ];
+
+      if (!location?.latitude && postcodeLocation) {
+        console.log(postcodeLocation)
+        dispatch(setLocation(postcodeLocation));
       }
 
       router.push("/service-category");

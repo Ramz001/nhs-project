@@ -93,7 +93,7 @@ export default function ServiceDetailPage() {
               )}
 
               {/* Directions Path */}
-              {location && googleMapsApiKey && (
+              {location?.latitude && googleMapsApiKey && (
                 <MapViewDirections
                   origin={location}
                   destination={{
