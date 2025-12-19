@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { MapPin } from "@tamagui/lucide-icons";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Alert, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, Text, YStack } from "tamagui";
@@ -32,8 +32,10 @@ export default function HomePage() {
     location,
   } = useAppSelector((state) => state.navigation);
   const dispatch = useAppDispatch();
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async () => {
+    setIsSearching(true);
     try {
       const validated = SearchValidationSchema.safeParse({
         postcode: Number(postcode),
@@ -46,10 +48,19 @@ export default function HomePage() {
         return;
       }
 
+      if (location?.latitude && location.longitude) {
+        router.push("/service-category");
+        return;
+      }
+
       const postcodeLocation = await getLocationFromPostcode(postcode!);
-      console.log('postcode location',postcodeLocation);
-      if (!location?.latitude && postcodeLocation?.latitude) {
-        console.log(postcodeLocation);
+
+      if (
+        !location?.latitude &&
+        !location?.longitude &&
+        postcodeLocation?.latitude &&
+        postcodeLocation?.longitude
+      ) {
         dispatch(setLocation(postcodeLocation));
         router.push("/service-category");
       }
@@ -57,6 +68,8 @@ export default function HomePage() {
       Alert.alert(
         e instanceof Error ? e.message : "An unexpected error occurred"
       );
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -146,7 +159,7 @@ export default function HomePage() {
             </Button>
 
             <Text fontSize="$3" color="$color" my="$1">
-              Example postcodes: 100150, 100122,
+              Example postcodes: 100115, 100190,
             </Text>
 
             {/* Age Input */}
@@ -165,8 +178,16 @@ export default function HomePage() {
             />
 
             {/* Search Button */}
-            <Button theme="green" mt="$3" onPress={handleSearch}>
-              <Text color="white">Search Services</Text>
+            <Button
+              theme="green"
+              mt="$3"
+              onPress={handleSearch}
+              disabled={isSearching}
+              opacity={isSearching ? 0.6 : 1}
+            >
+              <Text color="white">
+                {isSearching ? "Searching..." : "Search Services"}
+              </Text>
             </Button>
           </Card>
         </YStack>
