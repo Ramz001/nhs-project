@@ -18,7 +18,10 @@ import { Button, Card, Input, Text, YStack } from "tamagui";
 import z from "zod";
 
 const SearchValidationSchema = z.object({
-  postcode: z.number().min(100000).max(999999),
+  postcode: z
+    .number({ error: "Please provide a valid postcode" })
+    .min(100000, { error: "Please provide a valid postcode" })
+    .max(999999, { error: "Please provide a valid postcode" }),
   age: z.int().min(0).max(99).optional(),
 });
 
@@ -42,7 +45,7 @@ export default function HomePage() {
 
       if (!validated.success) {
         const firstError = validated.error.issues[0];
-        Alert.alert("Validation Error", firstError.message + postcode + age);
+        Alert.alert("Validation Error", firstError.message);
         return;
       }
 
@@ -52,7 +55,7 @@ export default function HomePage() {
         ];
 
       if (!location?.latitude && postcodeLocation) {
-        console.log(postcodeLocation)
+        console.log(postcodeLocation);
         dispatch(setLocation(postcodeLocation));
       }
 
