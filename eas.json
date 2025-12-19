@@ -4,8 +4,8 @@
     "appVersionSource": "remote"
   },
   "build": {
-     "development": {
-      "developmentClient": true,
+    "development": {
+      "developmentClient": false,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
@@ -15,7 +15,10 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk"
+      }
     }
   },
   "submit": {
