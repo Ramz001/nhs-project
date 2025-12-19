@@ -1,9 +1,11 @@
+import { addSelectedService } from "@/features/navigation/navigation.slice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import Constants from "expo-constants";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Platform, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,13 +15,15 @@ const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 
 export default function ServiceDetailPage() {
   const router = useRouter();
-  const service = router.state?.service;
+  const dispatch = useAppDispatch();
+  const service = useAppSelector((state) => state.navigation.currentService);
 
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
   const [locationPermission, setLocationPermission] = useState(false);
+  console.log(service);
 
   useEffect(() => {
     if (!service) return;
@@ -46,34 +50,29 @@ export default function ServiceDetailPage() {
       <SafeAreaView style={{ flex: 1 }}>
         <YStack flex={1} items="center" justify="center">
           <Text fontSize="$6">Service not provided</Text>
+          <Button mt="$4" onPress={() => router.back()}>
+            <XStack items="center" gap="$2">
+              <ArrowLeft />
+              <Text fontWeight="600" fontSize="$5">
+                Back
+              </Text>
+            </XStack>
+          </Button>
         </YStack>
       </SafeAreaView>
     );
   }
 
   const mapRegion = {
-    latitude: service.coordinates.latitude,
-    longitude: service.coordinates.longitude,
+    latitude: service.latitude,
+    longitude: service.longitude,
     latitudeDelta: 0.02,
     longitudeDelta: 0.02,
   };
 
   const handleGetDirections = () => {
-    const scheme = Platform.select({
-      ios: "maps:0,0?q=",
-      android: "geo:0,0?q=",
-    });
-    const latLng = `${service.coordinates.latitude},${service.coordinates.longitude}`;
-    const label = service.name;
-    const url = Platform.select({
-      ios: `${scheme}${label}@${latLng}`,
-      android: `${scheme}${latLng}(${label})`,
-    });
-
-    if (url) {
-      console.log("Opening directions:", url);
-      // Linking.openURL(url) in production
-    }
+    dispatch(addSelectedService(service));
+    router.back();
   };
 
   return (
@@ -91,7 +90,10 @@ export default function ServiceDetailPage() {
             >
               {/* Service Marker */}
               <Marker
-                coordinate={service.coordinates}
+                coordinate={{
+                  latitude: service.latitude,
+                  longitude: service.longitude,
+                }}
                 title={service.name}
                 description={service.address}
                 pinColor="red"
@@ -110,7 +112,10 @@ export default function ServiceDetailPage() {
               {userLocation && googleMapsApiKey && (
                 <MapViewDirections
                   origin={userLocation}
-                  destination={service.coordinates}
+                  destination={{
+                    latitude: service.latitude,
+                    longitude: service.longitude,
+                  }}
                   apikey={googleMapsApiKey}
                   strokeWidth={4}
                   strokeColor="blue"
@@ -129,7 +134,7 @@ export default function ServiceDetailPage() {
               <XStack items="center" gap="$2">
                 <MapPin size={18} color="$blue10" />
                 <Text fontSize="$5" fontWeight="600" color="$blue10">
-                  {service.distance} km away
+                  {} km away
                 </Text>
               </XStack>
             </YStack>
@@ -153,7 +158,7 @@ export default function ServiceDetailPage() {
                   </XStack>
                 </Card>
               )}
-              {service.phone && (
+              {service.telephone && (
                 <Card px="$4" py="$3" borderRadius="$4" elevate>
                   <XStack items="flex-start" gap="$3">
                     <Phone size={20} color="$blue10" style={{ marginTop: 2 }} />
@@ -161,7 +166,7 @@ export default function ServiceDetailPage() {
                       <Text fontSize="$3" fontWeight="600" color="$color">
                         PHONE
                       </Text>
-                      <Text fontSize="$5">{service.phone}</Text>
+                      <Text fontSize="$5">{service.telephone}</Text>
                     </YStack>
                   </XStack>
                 </Card>
@@ -177,7 +182,7 @@ export default function ServiceDetailPage() {
                 onPress={handleGetDirections}
               >
                 <Text color="white" fontWeight="600" fontSize="$5">
-                  Open in Maps
+                  Confirm Selection
                 </Text>
               </Button>
               <Button size="$5" bordered onPress={() => router.back()}>

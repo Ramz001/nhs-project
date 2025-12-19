@@ -1,3 +1,5 @@
+import { setServiceTypeId } from "@/features/navigation/navigation.slice";
+import { useAppDispatch } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import * as LucideIcons from "@tamagui/lucide-icons";
 import { ChevronRight } from "@tamagui/lucide-icons";
@@ -9,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, Circle, Text, XStack, YStack } from "tamagui";
 
 export default function ServiceCategoriesPage() {
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const { data: { data: services } = {}, isLoading } = useQuery({
@@ -17,9 +20,9 @@ export default function ServiceCategoriesPage() {
   });
 
   const handleCategoryPress = (id: string) => {
+    dispatch(setServiceTypeId(id));
     router.push({
       pathname: "/service-list",
-      params: { id },
     });
   };
 

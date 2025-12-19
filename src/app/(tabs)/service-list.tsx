@@ -1,18 +1,22 @@
+import ServiceCard from "@/components/service-card";
+import { Service } from "@/features/navigation/navigation.slice";
+import { useAppSelector } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
-import { Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React from "react";
 import { ActivityIndicator, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { Button, Card, Text, YStack } from "tamagui";
 
 export default function ServicesListPage() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const serviceTypeId = (params.id as string) || "";
-  console.log(params)
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const serviceTypeId = useAppSelector(
+    (store) => store.navigation.serviceTypeId
+  );
+  const selectedService = useAppSelector(
+    (store) => store.navigation.currentService
+  );
 
   const { data: { data: services } = {}, isLoading } = useQuery({
     queryKey: ["services", serviceTypeId],
@@ -49,84 +53,13 @@ export default function ServicesListPage() {
           {/* Services List */}
           <YStack gap="$3">
             {Array.isArray(services) &&
-              services.map((service: any) => {
-                const isSelected = selectedService === service.id;
-
-                return (
-                  <Card
-                    key={service.id}
-                    px="$4"
-                    py="$4"
-                    borderRadius="$4"
-                    elevate
-                    borderWidth={isSelected ? 2 : 0}
-                    borderColor={isSelected ? "$blue10" : "transparent"}
-                    bg={isSelected ? "$blue2" : "$background"}
-                    pressStyle={{ scale: 0.98 }}
-                    onPress={() => setSelectedService(service.id)}
-                  >
-                    <YStack gap="$3">
-                      {/* Header Row */}
-                      <XStack items="center" justify="space-between">
-                        <YStack flex={1} gap="$1">
-                          <Text fontSize="$6" fontWeight="600">
-                            {service.name}
-                          </Text>
-                          <XStack items="center" gap="$2">
-                            <MapPin size={16} color="$blue10" />
-                            <Text
-                              fontSize="$4"
-                              fontWeight="600"
-                              color="$blue10"
-                            >
-                              {service.distance || 0} km
-                            </Text>
-                          </XStack>
-                        </YStack>
-                        {isSelected && (
-                          <XStack
-                            bg="$blue10"
-                            px="$3"
-                            py="$2"
-                            rounded="$4"
-                            items="center"
-                            gap="$2"
-                          >
-                            <Check size={16} color="white" />
-                            <Text fontSize="$3" fontWeight="600" color="white">
-                              Selected
-                            </Text>
-                          </XStack>
-                        )}
-                      </XStack>
-
-                      {/* Address */}
-                      <XStack items="flex-start" gap="$2">
-                        <MapPin
-                          size={16}
-                          color="$color"
-                          style={{ marginTop: 2 }}
-                        />
-                        <Text fontSize="$4" color="$color" flex={1}>
-                          {service.address}
-                        </Text>
-                      </XStack>
-
-                      {/* Phone */}
-                      <XStack items="center" gap="$2">
-                        <Phone size={16} color="$color" />
-                        <Text fontSize="$4" color="$color">
-                          {service.telephone}
-                        </Text>
-                      </XStack>
-                    </YStack>
-                  </Card>
-                );
-              })}
+              services.map((service: Service) => (
+                <ServiceCard service={service} key={service.id} />
+              ))}
           </YStack>
 
           {/* Action Button */}
-          {selectedService && (
+          {selectedService?.id && (
             <Card
               px="$4"
               py="$4"
@@ -135,7 +68,6 @@ export default function ServicesListPage() {
               onPress={() =>
                 router.push({
                   pathname: `/service-detail`,
-                  params: { id: selectedService },
                 })
               }
             >
