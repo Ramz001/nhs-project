@@ -3,6 +3,7 @@ import { Calendar, MapPin, Phone } from "@tamagui/lucide-icons";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { ActivityIndicator, Linking, ScrollView } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, Separator, Text, XStack, YStack } from "tamagui";
 
@@ -24,7 +25,7 @@ interface PatientRecord {
 
 export default function HistoryPage() {
   const { data: { data: patientRecords } = {}, isLoading } = useQuery({
-    queryKey: ["patientRecords"],
+    queryKey: ["patient_record"],
     queryFn: async () =>
       supabase
         .from("patient_record")
@@ -85,24 +86,31 @@ export default function HistoryPage() {
                     bordered
                     borderColor="$borderColor"
                   >
-                    {/* Location Header */}
-                    <YStack
-                      height={100}
-                      justify="center"
-                      items="center"
-                      bg="$blue8"
-                      pressStyle={{ opacity: 0.8 }}
-                      cursor="pointer"
-                      onPress={openMaps}
-                    >
-                      <MapPin size={32} color="white" />
-                      <Text color="white" fontSize="$2" mt="$1" opacity={0.9}>
-                        {record.service.latitude.toFixed(4)},{" "}
-                        {record.service.longitude.toFixed(4)}
-                      </Text>
-                      <Text color="white" fontSize="$1" mt="$1" opacity={0.7}>
-                        Tap to open in Maps
-                      </Text>
+                    {/* Embedded Google Map */}
+                    <YStack height={200} overflow="hidden">
+                      <MapView
+                        style={{ flex: 1 }}
+                        initialRegion={{
+                          latitude: record.service.latitude,
+                          longitude: record.service.longitude,
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.01,
+                        }}
+                        scrollEnabled={false}
+                        zoomEnabled={false}
+                        pitchEnabled={false}
+                        rotateEnabled={false}
+                        onPress={openMaps}
+                      >
+                        <Marker
+                          coordinate={{
+                            latitude: record.service.latitude,
+                            longitude: record.service.longitude,
+                          }}
+                          title={record.service.name}
+                          description={record.service.address}
+                        />
+                      </MapView>
                     </YStack>
 
                     <YStack px="$4" py="$3" gap="$2.5">

@@ -3,6 +3,7 @@ import { setCurrentService } from "@/features/navigation/navigation.slice";
 import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
+import { queryClient } from "@/providers/query.provider";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -64,6 +65,9 @@ export default function ServiceDetailPage() {
     onSuccess: () => {
       dispatch(setCurrentService(null));
       Alert.alert("Success", "Service confirmed successfully!");
+      queryClient.invalidateQueries({
+        queryKey: ["patient_record"],
+      });
       router.push("/");
     },
     onError: (error) => {

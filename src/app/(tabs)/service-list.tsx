@@ -1,5 +1,6 @@
 import ServiceCard from "@/components/service-card";
 import { Service } from "@/features/navigation/navigation.slice";
+import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppSelector } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
@@ -7,23 +8,48 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { ActivityIndicator, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Card, Text, YStack } from "tamagui";
+import { Button, Text, YStack } from "tamagui";
 
 export default function ServicesListPage() {
   const router = useRouter();
 
-  const { currentService, serviceTypeId, postcode } = useAppSelector(
+  const { serviceTypeId, postcode, location } = useAppSelector(
     (store) => store.navigation
   );
 
-  const { data: { data: services } = {}, isLoading } = useQuery({
-    queryKey: ["services", serviceTypeId],
-    queryFn: async () =>
-      supabase
+  const { data: services = [], isLoading } = useQuery({
+    queryKey: ["service", serviceTypeId, postcode],
+    queryFn: async () => {
+      const { data } = await supabase
         .from("service")
         .select("*")
         .eq("service_type_id", serviceTypeId)
-        .eq("postcode", postcode),
+        .eq("postcode", postcode);
+
+      if (!data || !location) return data;
+
+      const withDistance = data
+        .map((service) => ({
+          ...service,
+          distance: Math.round(
+            getDistanceFromLatLonInKm(
+              location.latitude,
+              location.longitude,
+              service.latitude,
+              service.longitude
+            )
+          ),
+        }))
+        .sort((a, b) => a.distance - b.distance);
+
+      return withDistance;
+    },
+    enabled:
+      !!serviceTypeId &&
+      !!postcode &&
+      !!location &&
+      !!location?.latitude &&
+      !!location?.longitude,
   });
 
   if (isLoading) {
@@ -59,25 +85,6 @@ export default function ServicesListPage() {
                 <ServiceCard service={service} key={service.id} />
               ))}
           </YStack>
-
-          {/* Action Button */}
-          {currentService?.id && (
-            <Card
-              px="$4"
-              py="$4"
-              borderRadius="$4"
-              bg="$blue10"
-              onPress={() =>
-                router.push({
-                  pathname: `/service-detail`,
-                })
-              }
-            >
-              <Text color="white" fontWeight="600" fontSize="$5">
-                Continue with Selected Service
-              </Text>
-            </Card>
-          )}
         </YStack>
       </ScrollView>
     </SafeAreaView>

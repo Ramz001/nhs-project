@@ -15,7 +15,7 @@ export default function ServiceCategoriesPage() {
   const router = useRouter();
 
   const { data: { data: services } = {}, isLoading } = useQuery({
-    queryKey: ["serviceCategories"],
+    queryKey: ["service_category"],
     queryFn: async () => supabase.from("service_type").select("*"),
   });
 
