@@ -1,15 +1,59 @@
+import { setPostcode } from "@/features/navigation/navigation.slice";
+import { getPostcodeFromCoords } from "@/lib/get-postcode-from-coords";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { MapPin } from "@tamagui/lucide-icons";
+import Constants from "expo-constants";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ScrollView } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, Text, YStack } from "tamagui";
 
+const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
+
 export default function HomePage() {
   const router = useRouter();
+  const postcode = useAppSelector((state) => state.navigation.postcode);
+  const dispatch = useAppDispatch();
 
   const handleSearch = () => {
     router.push("/service-category");
+  };
+
+  const handleUseCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Location Permission Required",
+          "Allow location access to auto-fill your postcode."
+        );
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const postcode = await getPostcodeFromCoords(
+        location.coords.latitude,
+        location.coords.longitude,
+        googleMapsApiKey
+      );
+
+      if (postcode) {
+        dispatch(setPostcode(postcode));
+      } else {
+        Alert.alert(
+          "Postcode not found",
+          "We could not determine your postcode from this location."
+        );
+      }
+    } catch (error) {
+      console.warn("Location error:", error);
+      Alert.alert("Error", "Failed to retrieve your location.");
+    }
   };
 
   return (
@@ -39,12 +83,19 @@ export default function HomePage() {
               placeholder="e.g., 100123"
               borderColor="$borderColor"
               borderWidth={1}
+              value={postcode || ""}
+              onChangeText={(value) => dispatch(setPostcode(value))}
               px="$2.5"
               py="$2.5"
             />
 
             {/* Location Button */}
-            <Button theme="blue" mt="$2" icon={MapPin}>
+            <Button
+              onPress={handleUseCurrentLocation}
+              theme="blue"
+              mt="$2"
+              icon={MapPin}
+            >
               <Text color="white">Use Current Location</Text>
             </Button>
 
@@ -67,16 +118,6 @@ export default function HomePage() {
             <Button theme="green" mt="$3" onPress={handleSearch}>
               <Text color="white">Search Services</Text>
             </Button>
-          </Card>
-
-          {/* History Placeholder */}
-          <Card px="$4" py="$4" borderRadius="$4" elevate gap="$2">
-            <Text fontSize="$7" fontWeight="600">
-              History
-            </Text>
-            <Text fontSize="$4" color="$color">
-              Previously searched services will appear here.
-            </Text>
           </Card>
         </YStack>
       </ScrollView>
