@@ -1,12 +1,11 @@
 /* eslint-disable import/no-named-as-default */
-import { googleMapsApiKey } from "@/constants/config";
-import { postcodeToLocation } from "@/constants/postcodeToLocation";
 import {
   setAgeFilter,
   setLocation,
   setPostcode,
 } from "@/features/navigation/navigation.slice";
-import { getPostcodeFromCoords } from "@/lib/get-postcode-from-coords";
+import { getLocationFromPostcode } from "@/lib/get-location-from-postcode";
+import { getPostcodeFromLocation } from "@/lib/get-postcode-from-location";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { MapPin } from "@tamagui/lucide-icons";
 import * as Location from "expo-location";
@@ -25,7 +24,6 @@ const SearchValidationSchema = z.object({
   age: z.int().min(0).max(99).optional(),
 });
 
-
 export default function HomePage() {
   const router = useRouter();
   const {
@@ -35,7 +33,7 @@ export default function HomePage() {
   } = useAppSelector((state) => state.navigation);
   const dispatch = useAppDispatch();
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     try {
       const validated = SearchValidationSchema.safeParse({
         postcode: Number(postcode),
@@ -48,17 +46,13 @@ export default function HomePage() {
         return;
       }
 
-      const postcodeLocation =
-        postcodeToLocation[
-          validated.data.postcode as keyof typeof postcodeToLocation
-        ];
-
-      if (!location?.latitude && postcodeLocation) {
+      const postcodeLocation = await getLocationFromPostcode(postcode!);
+      console.log('postcode location',postcodeLocation);
+      if (!location?.latitude && postcodeLocation?.latitude) {
         console.log(postcodeLocation);
         dispatch(setLocation(postcodeLocation));
+        router.push("/service-category");
       }
-
-      router.push("/service-category");
     } catch (e) {
       Alert.alert(
         e instanceof Error ? e.message : "An unexpected error occurred"
@@ -77,25 +71,26 @@ export default function HomePage() {
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({
+      const liveLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
 
-      const postcode = await getPostcodeFromCoords(
-        location.coords.latitude,
-        location.coords.longitude,
-        googleMapsApiKey
+      const postcode = await getPostcodeFromLocation(
+        liveLocation.coords.latitude,
+        liveLocation.coords.longitude
       );
 
       if (postcode) {
         dispatch(setPostcode(postcode));
         dispatch(
           setLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+            latitude: liveLocation.coords.latitude,
+            longitude: liveLocation.coords.longitude,
           })
         );
       } else {
+        console.log(liveLocation, postcode);
+
         Alert.alert(
           "Postcode not found",
           "We could not determine your postcode from this location."
