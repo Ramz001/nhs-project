@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default */
 import {
   setAgeFilter,
   setLocation,
@@ -13,6 +14,12 @@ import React from "react";
 import { Alert, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Input, Text, YStack } from "tamagui";
+import z from "zod";
+
+const SearchValidationSchema = z.object({
+  postcode: z.number().min(100000).max(999999),
+  age: z.int().min(0).max(99).optional(),
+});
 
 const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 
@@ -23,7 +30,24 @@ export default function HomePage() {
   const dispatch = useAppDispatch();
 
   const handleSearch = () => {
-    router.push("/service-category");
+    try {
+      const validated = SearchValidationSchema.safeParse({
+        postcode: Number(postcode),
+        age,
+      });
+
+      if (!validated.success) {
+        const firstError = validated.error.issues[0];
+        Alert.alert("Validation Error", firstError.message);
+        return;
+      }
+
+      router.push("/service-category");
+    } catch (e) {
+      Alert.alert(
+        e instanceof Error ? e.message : "An unexpected error occurred"
+      );
+    }
   };
 
   const handleUseCurrentLocation = async () => {

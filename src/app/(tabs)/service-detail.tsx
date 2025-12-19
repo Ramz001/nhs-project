@@ -3,9 +3,8 @@ import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import Constants from "expo-constants";
-import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ScrollView } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -29,31 +28,6 @@ export default function ServiceDetailPage() {
           currentService.longitude
         ).toFixed(1)
       : null;
-  const [userLocation, setUserLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-  const [locationPermission, setLocationPermission] = useState(false);
-
-  useEffect(() => {
-    if (!currentService) return;
-
-    (async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === "granted") {
-          setLocationPermission(true);
-          const location = await Location.getCurrentPositionAsync({});
-          setUserLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-        }
-      } catch (error) {
-        console.warn("Location access failed:", error);
-      }
-    })();
-  }, [currentService]);
 
   if (!currentService) {
     return (
@@ -95,8 +69,8 @@ export default function ServiceDetailPage() {
               style={{ width: "100%", height: "100%" }}
               provider={PROVIDER_GOOGLE}
               initialRegion={mapRegion}
-              showsUserLocation={locationPermission}
-              showsMyLocationButton={locationPermission}
+              showsUserLocation={!!location}
+              showsMyLocationButton={!!location}
             >
               {/* Service Marker */}
               <Marker
@@ -110,18 +84,18 @@ export default function ServiceDetailPage() {
               />
 
               {/* User Marker */}
-              {userLocation && (
+              {location && (
                 <Marker
-                  coordinate={userLocation}
+                  coordinate={location}
                   title="Your Location"
                   pinColor="blue"
                 />
               )}
 
               {/* Directions Path */}
-              {userLocation && googleMapsApiKey && (
+              {location && googleMapsApiKey && (
                 <MapViewDirections
-                  origin={userLocation}
+                  origin={location}
                   destination={{
                     latitude: currentService.latitude,
                     longitude: currentService.longitude,
