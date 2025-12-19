@@ -1,13 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import "expo-sqlite/localStorage/install";
-import Constants from 'expo-constants';
-const { supabaseUrl, supabaseKey } = Constants.expoConfig?.extra || {};
+import { supabaseUrl, supabaseAnonKey } from "@/constants/config";
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase environment variables not set!');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Supabase environment variables not set!");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: localStorage,
     autoRefreshToken: true,
