@@ -18,7 +18,6 @@ interface NavigationState {
   currentService: Service | null;
   serviceTypeId: string | null;
   selectedServices: Service[];
-  ageFilter: number | null;
   location?: Location;
 }
 
@@ -27,7 +26,6 @@ const initialState: NavigationState = {
   currentService: null,
   serviceTypeId: null,
   selectedServices: [],
-  ageFilter: null,
 };
 
 const navigation = createSlice({
@@ -49,9 +47,6 @@ const navigation = createSlice({
     resetSeletedServices(state) {
       state.selectedServices = [];
     },
-    setAgeFilter(state, action) {
-      state.ageFilter = action.payload;
-    },
     setLocation(state, action) {
       state.location = action.payload;
     },
@@ -63,7 +58,6 @@ export const {
   setCurrentService,
   setServiceTypeId,
   addSelectedService,
-  setAgeFilter,
   setLocation,
   resetSeletedServices,
 } = navigation.actions;

@@ -1,0 +1,21 @@
+@startuml
+actor Nurse
+participant "Mobile App UI" as UI
+participant "Geoapify API" as Geo
+participant "Distance Service" as Distance
+participant "Database" as DB
+
+Nurse -> UI : Enter postcode / Use location
+UI -> Geo : Request coordinates/postcode
+Geo --> UI : Location data
+
+UI -> DB : Request services by category
+DB --> UI : Service list
+
+UI -> Distance : Calculate distances
+Distance --> UI : Distances
+
+Nurse -> UI : Confirm service
+UI -> DB : Save patient record
+DB --> UI : Confirmation success
+@enduml

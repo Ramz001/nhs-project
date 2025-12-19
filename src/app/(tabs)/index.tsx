@@ -1,6 +1,5 @@
 /* eslint-disable import/no-named-as-default */
 import {
-  setAgeFilter,
   setLocation,
   setPostcode,
 } from "@/features/navigation/navigation.slice";
@@ -26,11 +25,7 @@ const SearchValidationSchema = z.object({
 
 export default function HomePage() {
   const router = useRouter();
-  const {
-    postcode,
-    ageFilter: age,
-    location,
-  } = useAppSelector((state) => state.navigation);
+  const { postcode, location } = useAppSelector((state) => state.navigation);
   const dispatch = useAppDispatch();
   const [isSearching, setIsSearching] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -40,7 +35,6 @@ export default function HomePage() {
     try {
       const validated = SearchValidationSchema.safeParse({
         postcode: Number(postcode),
-        age: age ? Number(age) : undefined,
       });
 
       if (!validated.success) {
@@ -157,38 +151,21 @@ export default function HomePage() {
               onPress={handleUseCurrentLocation}
               disabled={isGettingLocation}
               opacity={isGettingLocation ? 0.6 : 1}
-              theme="blue"
+              variant="outlined"
+              size="$3"
               icon={MapPin}
+              self="flex-start"
             >
-              <Text color="white">
-                {isGettingLocation
-                  ? "Getting Location..."
-                  : "Use Current Location"}
-              </Text>
+              {isGettingLocation ? "Getting Location..." : "Use My Location"}
             </Button>
 
             <Text fontSize="$3" color="$color" my="$1">
               Example postcodes: 100115, 100190,
             </Text>
 
-            {/* Age Input */}
-            <Input
-              placeholder="Age"
-              borderColor="$borderColor"
-              borderWidth={1}
-              px="$2.5"
-              py="$2.5"
-              value={age ? String(age) : ""}
-              onChangeText={(value) =>
-                dispatch(setAgeFilter(value ? Number(value) : null))
-              }
-              keyboardType="numeric"
-              mt="$2"
-            />
-
             {/* Search Button */}
             <Button
-              theme="green"
+              theme="blue"
               mt="$3"
               onPress={handleSearch}
               disabled={isSearching}

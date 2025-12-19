@@ -1,0 +1,25 @@
+@startuml
+start
+:Open Application;
+
+if (Postcode entered?) then (Yes)
+  :Convert postcode to location;
+else (No)
+  :Request location permission;
+  :Get GPS coordinates;
+  :Convert location to postcode;
+endif
+
+:Select service category;
+:Retrieve services;
+:Calculate distance to services;
+:Sort services by distance;
+:Display service list;
+
+:Select service;
+:View service details;
+:Confirm service;
+
+:Save record to database;
+stop
+@enduml

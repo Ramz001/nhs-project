@@ -1,0 +1,57 @@
+@startuml
+class Nurse {
+  +searchServices()
+  +confirmService()
+  +viewHistory()
+}
+
+class ServiceType {
+  id: string
+  title: string
+  description: string
+  icon: string
+  minAge: number
+  maxAge: number
+  createdAt: Date
+}
+
+class Service {
+  id: string
+  name: string
+  address: string
+  postcode: string
+  latitude: number
+  longitude: number
+  telephone: string
+  createdAt: Date
+}
+
+class PatientRecord {
+  id: string
+  postcode: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+class GeoService {
+  +getLocationFromPostcode()
+  +getPostcodeFromLocation()
+}
+
+class DistanceCalculator {
+  +getDistanceFromLatLonInKm()
+}
+
+' Relationships
+Nurse --> Service : interacts
+Nurse --> PatientRecord : manages
+
+Service --> ServiceType : belongsTo
+PatientRecord --> Service : references
+
+' Value objects
+Service ..> "Location" : contains
+GeoService --> Service : uses
+DistanceCalculator --> Service : calculates distance
+
+@enduml

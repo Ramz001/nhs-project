@@ -1,0 +1,17 @@
+@startuml
+actor Nurse
+actor "Location Service" as Location
+actor "Geoapify API" as Geoapify
+
+Nurse --> (Enter Postcode)
+Nurse --> (Use Current Location)
+Nurse --> (Select Service Category)
+Nurse --> (View Nearby Services)
+Nurse --> (View Service Details)
+Nurse --> (Confirm Service)
+Nurse --> (View Service History)
+
+(Use Current Location) --> Location
+(Enter Postcode) --> Geoapify
+(Use Current Location) --> Geoapify
+@enduml
