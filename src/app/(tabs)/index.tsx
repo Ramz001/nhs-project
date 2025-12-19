@@ -1,4 +1,7 @@
-import { setPostcode } from "@/features/navigation/navigation.slice";
+import {
+  setAgeFilter,
+  setPostcode,
+} from "@/features/navigation/navigation.slice";
 import { getPostcodeFromCoords } from "@/lib/get-postcode-from-coords";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { MapPin } from "@tamagui/lucide-icons";
@@ -15,6 +18,7 @@ const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 export default function HomePage() {
   const router = useRouter();
   const postcode = useAppSelector((state) => state.navigation.postcode);
+  const age = useAppSelector((state) => state.navigation.ageFilter);
   const dispatch = useAppDispatch();
 
   const handleSearch = () => {
@@ -110,6 +114,10 @@ export default function HomePage() {
               borderWidth={1}
               px="$2.5"
               py="$2.5"
+              value={age ? String(age) : ""}
+              onChangeText={(value) =>
+                dispatch(setAgeFilter(value ? Number(value) : null))
+              }
               keyboardType="numeric"
               mt="$2"
             />

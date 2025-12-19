@@ -11,17 +11,19 @@ import { Button, Card, Text, YStack } from "tamagui";
 
 export default function ServicesListPage() {
   const router = useRouter();
-  const serviceTypeId = useAppSelector(
-    (store) => store.navigation.serviceTypeId
-  );
-  const selectedService = useAppSelector(
-    (store) => store.navigation.currentService
+
+  const { currentService, serviceTypeId, postcode } = useAppSelector(
+    (store) => store.navigation
   );
 
   const { data: { data: services } = {}, isLoading } = useQuery({
     queryKey: ["services", serviceTypeId],
     queryFn: async () =>
-      supabase.from("service").select("*").eq("service_type_id", serviceTypeId),
+      supabase
+        .from("service")
+        .select("*")
+        .eq("service_type_id", serviceTypeId)
+        .eq("postcode", postcode),
   });
 
   if (isLoading) {
@@ -59,7 +61,7 @@ export default function ServicesListPage() {
           </YStack>
 
           {/* Action Button */}
-          {selectedService?.id && (
+          {currentService?.id && (
             <Card
               px="$4"
               py="$4"
