@@ -1,5 +1,6 @@
 import {
   setAgeFilter,
+  setLocation,
   setPostcode,
 } from "@/features/navigation/navigation.slice";
 import { getPostcodeFromCoords } from "@/lib/get-postcode-from-coords";
@@ -48,6 +49,12 @@ export default function HomePage() {
 
       if (postcode) {
         dispatch(setPostcode(postcode));
+        dispatch(
+          setLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          })
+        );
       } else {
         Alert.alert(
           "Postcode not found",
@@ -104,7 +111,7 @@ export default function HomePage() {
             </Button>
 
             <Text fontSize="$3" color="$color" my="$1">
-              Example postcodes: 100150, 400200, 100122, 400211
+              Example postcodes: 100150, 100122,
             </Text>
 
             {/* Age Input */}

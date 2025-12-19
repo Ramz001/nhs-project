@@ -1,4 +1,5 @@
 import { addSelectedService } from "@/features/navigation/navigation.slice";
+import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import Constants from "expo-constants";
@@ -16,17 +17,26 @@ const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 export default function ServiceDetailPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const service = useAppSelector((state) => state.navigation.currentService);
-
+  const { location, currentService } = useAppSelector(
+    (state) => state.navigation
+  );
+  const distance =
+    location && currentService?.latitude && currentService?.longitude
+      ? getDistanceFromLatLonInKm(
+          location.latitude,
+          location.longitude,
+          currentService.latitude,
+          currentService.longitude
+        ).toFixed(1)
+      : null;
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
   const [locationPermission, setLocationPermission] = useState(false);
-  console.log(service);
 
   useEffect(() => {
-    if (!service) return;
+    if (!currentService) return;
 
     (async () => {
       try {
@@ -43,9 +53,9 @@ export default function ServiceDetailPage() {
         console.warn("Location access failed:", error);
       }
     })();
-  }, [service]);
+  }, [currentService]);
 
-  if (!service) {
+  if (!currentService) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <YStack flex={1} items="center" justify="center">
@@ -64,14 +74,14 @@ export default function ServiceDetailPage() {
   }
 
   const mapRegion = {
-    latitude: service.latitude,
-    longitude: service.longitude,
+    latitude: currentService.latitude,
+    longitude: currentService.longitude,
     latitudeDelta: 0.02,
     longitudeDelta: 0.02,
   };
 
   const handleGetDirections = () => {
-    dispatch(addSelectedService(service));
+    dispatch(addSelectedService(currentService));
     router.back();
   };
 
@@ -91,11 +101,11 @@ export default function ServiceDetailPage() {
               {/* Service Marker */}
               <Marker
                 coordinate={{
-                  latitude: service.latitude,
-                  longitude: service.longitude,
+                  latitude: currentService.latitude,
+                  longitude: currentService.longitude,
                 }}
-                title={service.name}
-                description={service.address}
+                title={currentService.name}
+                description={currentService.address}
                 pinColor="red"
               />
 
@@ -113,8 +123,8 @@ export default function ServiceDetailPage() {
                 <MapViewDirections
                   origin={userLocation}
                   destination={{
-                    latitude: service.latitude,
-                    longitude: service.longitude,
+                    latitude: currentService.latitude,
+                    longitude: currentService.longitude,
                   }}
                   apikey={googleMapsApiKey}
                   strokeWidth={4}
@@ -129,19 +139,19 @@ export default function ServiceDetailPage() {
           <YStack px="$4" py="$4" gap="$4">
             <YStack gap="$2">
               <Text fontSize="$8" fontWeight="700">
-                {service.name}
+                {currentService.name}
               </Text>
               <XStack items="center" gap="$2">
                 <MapPin size={18} color="$blue10" />
                 <Text fontSize="$5" fontWeight="600" color="$blue10">
-                  {} km away
+                  {distance || 0} km away
                 </Text>
               </XStack>
             </YStack>
 
             {/* Details Cards */}
             <YStack gap="$3">
-              {service.address && (
+              {currentService.address && (
                 <Card px="$4" py="$3" borderRadius="$4" elevate>
                   <XStack items="flex-start" gap="$3">
                     <MapPin
@@ -153,12 +163,12 @@ export default function ServiceDetailPage() {
                       <Text fontSize="$3" fontWeight="600" color="$color">
                         ADDRESS
                       </Text>
-                      <Text fontSize="$5">{service.address}</Text>
+                      <Text fontSize="$5">{currentService.address}</Text>
                     </YStack>
                   </XStack>
                 </Card>
               )}
-              {service.telephone && (
+              {currentService.telephone && (
                 <Card px="$4" py="$3" borderRadius="$4" elevate>
                   <XStack items="flex-start" gap="$3">
                     <Phone size={20} color="$blue10" style={{ marginTop: 2 }} />
@@ -166,7 +176,7 @@ export default function ServiceDetailPage() {
                       <Text fontSize="$3" fontWeight="600" color="$color">
                         PHONE
                       </Text>
-                      <Text fontSize="$5">{service.telephone}</Text>
+                      <Text fontSize="$5">{currentService.telephone}</Text>
                     </YStack>
                   </XStack>
                 </Card>

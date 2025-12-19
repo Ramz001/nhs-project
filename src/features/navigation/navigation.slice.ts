@@ -8,6 +8,10 @@ export interface Service {
   longitude: number;
   latitude: number;
 }
+interface Location {
+  latitude: number;
+  longitude: number;
+}
 
 interface NavigationState {
   postcode: string | null;
@@ -15,6 +19,7 @@ interface NavigationState {
   serviceTypeId: string | null;
   selectedServices: Service[];
   ageFilter: number | null;
+  location?: Location;
 }
 
 const initialState: NavigationState = {
@@ -47,6 +52,9 @@ const navigation = createSlice({
     setAgeFilter(state, action) {
       state.ageFilter = action.payload;
     },
+    setLocation(state, action) {
+      state.location = action.payload;
+    },
   },
 });
 
@@ -56,7 +64,8 @@ export const {
   setServiceTypeId,
   addSelectedService,
   setAgeFilter,
-  resetSeletedServices
+  setLocation,
+  resetSeletedServices,
 } = navigation.actions;
 
 export default navigation.reducer;

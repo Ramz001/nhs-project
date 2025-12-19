@@ -2,17 +2,27 @@ import {
   Service,
   setCurrentService,
 } from "@/features/navigation/navigation.slice";
+import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Check, MapPin, Phone } from "@tamagui/lucide-icons";
 import { Card, Text, XStack, YStack } from "tamagui";
 
 export default function ServiceCard({ service }: { service: Service }) {
   const dispatch = useAppDispatch();
-  const selectedService = useAppSelector(
-    (store) => store.navigation.currentService
+  const { currentService, location } = useAppSelector(
+    (store) => store.navigation
   );
-  const isSelected = selectedService?.id === service.id;
 
+  const isSelected = currentService?.id === service.id;
+  const distance =
+    location && service.latitude && service.longitude
+      ? getDistanceFromLatLonInKm(
+          location.latitude,
+          location.longitude,
+          service.latitude,
+          service.longitude
+        ).toFixed(1)
+      : null;
   return (
     <Card
       key={service.id}
@@ -36,7 +46,7 @@ export default function ServiceCard({ service }: { service: Service }) {
             <XStack items="center" gap="$2">
               <MapPin size={16} color="$blue10" />
               <Text fontSize="$4" fontWeight="600" color="$blue10">
-                {0} km
+                {distance || 0} km
               </Text>
             </XStack>
           </YStack>
