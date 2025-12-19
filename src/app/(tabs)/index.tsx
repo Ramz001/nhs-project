@@ -33,6 +33,7 @@ export default function HomePage() {
   } = useAppSelector((state) => state.navigation);
   const dispatch = useAppDispatch();
   const [isSearching, setIsSearching] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -74,6 +75,7 @@ export default function HomePage() {
   };
 
   const handleUseCurrentLocation = async () => {
+    setIsGettingLocation(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -112,6 +114,8 @@ export default function HomePage() {
     } catch (error) {
       console.warn("Location error:", error);
       Alert.alert("Error", "Failed to retrieve your location.");
+    } finally {
+      setIsGettingLocation(false);
     }
   };
 
@@ -151,11 +155,16 @@ export default function HomePage() {
             {/* Location Button */}
             <Button
               onPress={handleUseCurrentLocation}
-              theme="blue"
-              mt="$2"
+              disabled={isGettingLocation}
+              opacity={isGettingLocation ? 0.6 : 1}
+              theme='blue'
               icon={MapPin}
             >
-              <Text color="white">Use Current Location</Text>
+              <Text color="white">
+                {isGettingLocation
+                  ? "Getting Location..."
+                  : "Use Current Location"}
+              </Text>
             </Button>
 
             <Text fontSize="$3" color="$color" my="$1">

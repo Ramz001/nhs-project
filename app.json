@@ -20,7 +20,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ramz001.nationalhealthsystem"
+      "package": "com.ramz001.nationalhealthsystem",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDI8NCEcSpw0jSPbckOfe5ugLSs7ihTeyU"
+        }
+      }
     },
     "web": {
       "output": "static",
