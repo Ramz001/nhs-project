@@ -1,8 +1,8 @@
+import { googleMapsApiKey } from "@/constants/config";
 import { addSelectedService } from "@/features/navigation/navigation.slice";
 import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
-import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView } from "react-native";
@@ -10,8 +10,6 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
-
-const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 
 export default function ServiceDetailPage() {
   const router = useRouter();

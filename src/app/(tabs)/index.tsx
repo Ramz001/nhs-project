@@ -1,4 +1,5 @@
 /* eslint-disable import/no-named-as-default */
+import { googleMapsApiKey } from "@/constants/config";
 import { postcodeToLocation } from "@/constants/postcodeToLocation";
 import {
   setAgeFilter,
@@ -8,7 +9,6 @@ import {
 import { getPostcodeFromCoords } from "@/lib/get-postcode-from-coords";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { MapPin } from "@tamagui/lucide-icons";
-import Constants from "expo-constants";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -25,7 +25,6 @@ const SearchValidationSchema = z.object({
   age: z.int().min(0).max(99).optional(),
 });
 
-const { googleMapsApiKey } = Constants.expoConfig?.extra || {};
 
 export default function HomePage() {
   const router = useRouter();

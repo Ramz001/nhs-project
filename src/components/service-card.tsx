@@ -5,9 +5,11 @@ import {
 import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { Check, MapPin, Phone } from "@tamagui/lucide-icons";
+import { useRouter } from "expo-router";
 import { Card, Text, XStack, YStack } from "tamagui";
 
 export default function ServiceCard({ service }: { service: Service }) {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { currentService, location } = useAppSelector(
     (store) => store.navigation
@@ -23,6 +25,14 @@ export default function ServiceCard({ service }: { service: Service }) {
           service.longitude
         ).toFixed(1)
       : null;
+
+  const handleClick = () => {
+    router.push({
+      pathname: `/service-detail`,
+    });
+    dispatch(setCurrentService(service));
+  };
+
   return (
     <Card
       key={service.id}
@@ -34,7 +44,7 @@ export default function ServiceCard({ service }: { service: Service }) {
       borderColor={isSelected ? "$blue10" : "transparent"}
       bg={isSelected ? "$blue2" : "$background"}
       pressStyle={{ scale: 0.98 }}
-      onPress={() => dispatch(setCurrentService(service))}
+      onPress={handleClick}
     >
       <YStack gap="$3">
         {/* Header Row */}
