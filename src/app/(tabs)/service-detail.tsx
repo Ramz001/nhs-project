@@ -1,20 +1,31 @@
 import { googleMapsApiKey } from "@/constants/config";
-import { addSelectedService } from "@/features/navigation/navigation.slice";
+import { setCurrentService } from "@/features/navigation/navigation.slice";
 import { getDistanceFromLatLonInKm } from "@/lib/get-distance-from-lat-lon";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { supabase } from "@/lib/supabase";
 import { ArrowLeft, Check, MapPin, Phone } from "@tamagui/lucide-icons";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ScrollView } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Card, Text, XStack, YStack } from "tamagui";
+import { z } from "zod";
+
+const ConfirmServiceSchema = z.object({
+  serviceId: z.string({ error: "Service ID must be a positive number" }),
+  postcode: z
+    .number({ error: "Please provide a valid postcode" })
+    .min(100000, { error: "Please provide a valid postcode" })
+    .max(999999, { error: "Please provide a valid postcode" }),
+});
 
 export default function ServiceDetailPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { location, currentService } = useAppSelector(
+  const { location, currentService, postcode } = useAppSelector(
     (state) => state.navigation
   );
   const distance =
@@ -26,6 +37,42 @@ export default function ServiceDetailPage() {
           currentService.longitude
         ).toFixed(1)
       : null;
+
+  const confirmServiceMutation = useMutation({
+    mutationFn: async ({
+      serviceId,
+      postcode,
+    }: {
+      serviceId: string;
+      postcode: number;
+    }) => {
+      const validated = ConfirmServiceSchema.safeParse({ serviceId, postcode });
+
+      if (!validated.success) {
+        const firstError = validated.error.issues[0];
+        throw new Error(firstError.message);
+      }
+
+      const { data, error } = await supabase.from("patient_record").insert({
+        service_id: validated.data.serviceId,
+        postcode: validated.data.postcode,
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      dispatch(setCurrentService(null));
+      Alert.alert("Success", "Service confirmed successfully!");
+      router.push("/");
+    },
+    onError: (error) => {
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "Failed to confirm service"
+      );
+    },
+  });
 
   if (!currentService) {
     return (
@@ -51,10 +98,13 @@ export default function ServiceDetailPage() {
     latitudeDelta: 0.02,
     longitudeDelta: 0.02,
   };
-
-  const handleGetDirections = () => {
-    dispatch(addSelectedService(currentService));
-    router.back();
+  const handleConfirmService = () => {
+    if (currentService?.id && postcode) {
+      confirmServiceMutation.mutate({
+        serviceId: currentService.id,
+        postcode: Number(postcode),
+      });
+    }
   };
 
   return (
@@ -161,10 +211,14 @@ export default function ServiceDetailPage() {
                 theme="blue"
                 size="$5"
                 icon={<Check size={20} color="white" />}
-                onPress={handleGetDirections}
+                onPress={handleConfirmService}
+                disabled={confirmServiceMutation.isPending}
+                opacity={confirmServiceMutation.isPending ? 0.6 : 1}
               >
                 <Text color="white" fontWeight="600" fontSize="$5">
-                  Confirm Selection
+                  {confirmServiceMutation.isPending
+                    ? "Confirming..."
+                    : "Confirm Selection"}
                 </Text>
               </Button>
               <Button size="$5" bordered onPress={() => router.back()}>

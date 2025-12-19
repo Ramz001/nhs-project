@@ -22,13 +22,9 @@ export async function getLocationFromPostcode(
   console.log('url',url);
   const res = await fetch(url);
   if (!res.ok) return null;
-  console.log('response',res);
   const data = (await res.json()) as GeoapifyPostcodeListResponse;
-  console.log(data)
   if (!data.features || data.features.length === 0) return null;
-  console.log('data features',data.features);
   const { lat, lon } = data.features[0].properties;
-  console.log(data.features, url);
   return {
     latitude: lat,
     longitude: lon,
