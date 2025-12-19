@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { Calendar, MapPin, Phone } from "@tamagui/lucide-icons";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ActivityIndicator, Linking, ScrollView } from "react-native";
+import { ActivityIndicator, ScrollView } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card, Separator, Text, XStack, YStack } from "tamagui";
@@ -70,95 +70,81 @@ export default function HistoryPage() {
           {/* Patient Records List */}
           <YStack gap="$3">
             {Array.isArray(patientRecords) &&
-              patientRecords.map((record: PatientRecord) => {
-                const openMaps = () => {
-                  const url = `https://www.google.com/maps/search/?api=1&query=${record.service.latitude},${record.service.longitude}`;
-                  Linking.openURL(url);
-                };
-
-                return (
-                  <Card
-                    key={record.id}
-                    overflow="hidden"
-                    borderRadius="$5"
-                    elevate
-                    bg="$background"
-                    bordered
-                    borderColor="$borderColor"
-                  >
-                    {/* Embedded Google Map */}
-                    <YStack height={200} overflow="hidden">
-                      <MapView
-                        style={{ flex: 1 }}
-                        initialRegion={{
+              patientRecords.map((record: PatientRecord) => (
+                <Card
+                  key={record.id}
+                  overflow="hidden"
+                  borderRadius="$5"
+                  elevate
+                  bg="$background"
+                  bordered
+                  borderColor="$borderColor"
+                >
+                  <YStack height={200} overflow="hidden">
+                    <MapView
+                      style={{ flex: 1 }}
+                      initialRegion={{
+                        latitude: record.service.latitude,
+                        longitude: record.service.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                      }}
+                      scrollEnabled={false}
+                      zoomEnabled={false}
+                      pitchEnabled={false}
+                      rotateEnabled={false}
+                    >
+                      <Marker
+                        coordinate={{
                           latitude: record.service.latitude,
                           longitude: record.service.longitude,
-                          latitudeDelta: 0.01,
-                          longitudeDelta: 0.01,
                         }}
-                        scrollEnabled={false}
-                        zoomEnabled={false}
-                        pitchEnabled={false}
-                        rotateEnabled={false}
-                        onPress={openMaps}
-                      >
-                        <Marker
-                          coordinate={{
-                            latitude: record.service.latitude,
-                            longitude: record.service.longitude,
-                          }}
-                          title={record.service.name}
-                          description={record.service.address}
-                        />
-                      </MapView>
+                        title={record.service.name}
+                        description={record.service.address}
+                      />
+                    </MapView>
+                  </YStack>
+
+                  <YStack px="$4" py="$3" gap="$2.5">
+                    <Text fontSize="$6" fontWeight="700" lineHeight="$1">
+                      {record.service.name}
+                    </Text>
+
+                    <Separator />
+
+                    <YStack gap="$2">
+                      <XStack items="flex-start" gap="$2">
+                        <MapPin size={16} style={{ marginTop: 2 }} />
+                        <Text fontSize="$3" flex={1} lineHeight="$1">
+                          {record.service.address}
+                        </Text>
+                      </XStack>
+
+                      <XStack items="center" gap="$2">
+                        <Phone size={16} />
+                        <Text fontSize="$3">{record.service.telephone}</Text>
+                      </XStack>
+
+                      <XStack items="center" gap="$2">
+                        <Calendar size={16} />
+                        <Text fontSize="$3">
+                          {new Date(record.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </Text>
+                        <Text fontSize="$3" fontWeight="600">
+                          • {record.postcode}
+                        </Text>
+                      </XStack>
                     </YStack>
-
-                    <YStack px="$4" py="$3" gap="$2.5">
-                      {/* Service Name */}
-                      <Text fontSize="$6" fontWeight="700" lineHeight="$1">
-                        {record.service.name}
-                      </Text>
-
-                      <Separator />
-
-                      {/* Details */}
-                      <YStack gap="$2">
-                        {/* Address */}
-                        <XStack items="flex-start" gap="$2">
-                          <MapPin size={16} style={{ marginTop: 2 }} />
-                          <Text fontSize="$3" flex={1} lineHeight="$1">
-                            {record.service.address}
-                          </Text>
-                        </XStack>
-
-                        {/* Phone */}
-                        <XStack items="center" gap="$2">
-                          <Phone size={16} />
-                          <Text fontSize="$3">{record.service.telephone}</Text>
-                        </XStack>
-
-                        {/* Date and Postcode */}
-                        <XStack items="center" gap="$2">
-                          <Calendar size={16} />
-                          <Text fontSize="$3">
-                            {new Date(record.created_at).toLocaleDateString(
-                              "en-GB",
-                              {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              }
-                            )}
-                          </Text>
-                          <Text fontSize="$3" fontWeight="600">
-                            • {record.postcode}
-                          </Text>
-                        </XStack>
-                      </YStack>
-                    </YStack>
-                  </Card>
-                );
-              })}
+                  </YStack>
+                </Card>
+              ))}
           </YStack>
         </YStack>
       </ScrollView>

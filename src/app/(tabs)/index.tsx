@@ -157,7 +157,7 @@ export default function HomePage() {
               onPress={handleUseCurrentLocation}
               disabled={isGettingLocation}
               opacity={isGettingLocation ? 0.6 : 1}
-              theme='blue'
+              theme="blue"
               icon={MapPin}
             >
               <Text color="white">
